@@ -65,10 +65,14 @@ docker-compose down
 배포 시 자동으로 설정되는 항목:
 - Docker 컨테이너 빌드 및 실행
 - Nginx 리버스 프록시 설정
-- Let's Encrypt SSL 인증서 발급
+- Let's Encrypt SSL 인증서 발급 (AWS 보안 그룹 설정 필요)
 - HTTPS 자동 리다이렉트
 
-자세한 배포 설정 방법은 [QUICK_START.md](./QUICK_START.md) 또는 [DEPLOYMENT.md](./DEPLOYMENT.md)를 참고하세요.
+### 배포 가이드
+- [QUICK_START.md](./QUICK_START.md) - 빠른 시작 가이드
+- [DEPLOYMENT.md](./DEPLOYMENT.md) - 상세 배포 가이드
+- [SSL_SETUP_GUIDE.md](./SSL_SETUP_GUIDE.md) - SSL 인증서 수동 발급 가이드 (필수!)
+- [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) - 문제 해결 가이드
 
 ## 프로젝트 구조
 
