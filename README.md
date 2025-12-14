@@ -46,13 +46,13 @@ API 문서: http://localhost:8000/docs
 
 ```bash
 # 이미지 빌드 및 실행
-docker compose up -d
+docker-compose up -d
 
 # 로그 확인
-docker compose logs -f
+docker-compose logs -f
 
 # 중지
-docker compose down
+docker-compose down
 ```
 
 ## 배포

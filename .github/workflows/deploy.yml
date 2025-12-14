@@ -90,10 +90,10 @@ jobs:
             sudo nginx -t && sudo systemctl restart nginx
             
             # Docker Compose로 배포
-            docker compose down || true
-            docker compose pull || true
-            docker compose build
-            docker compose up -d
+            docker-compose down || true
+            docker-compose pull || true
+            docker-compose build
+            docker-compose up -d
             
             # SSL 인증서 설정 (처음 한 번만 실행됨)
             if [ ! -f "/etc/letsencrypt/live/${{ env.BACKEND_DOMAIN }}/fullchain.pem" ]; then

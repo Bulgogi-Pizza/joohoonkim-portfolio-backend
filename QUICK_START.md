@@ -143,7 +143,7 @@ ssh -i joohoonkim-portfolio-backend-main-key.pem ec2-user@13.209.8.80
 cd /home/ec2-user/portfolio-backend
 
 # Docker 로그
-docker compose logs -f
+docker-compose logs -f
 
 # Nginx 로그
 sudo tail -f /var/log/nginx/error.log
@@ -177,19 +177,19 @@ sudo systemctl reload nginx
 ### 컨테이너 재시작
 ```bash
 cd /home/ec2-user/portfolio-backend
-docker compose restart
+docker-compose restart
 ```
 
 ### 완전히 재배포
 ```bash
 cd /home/ec2-user/portfolio-backend
-docker compose down
-docker compose up -d --build
+docker-compose down
+docker-compose up -d --build
 ```
 
 ### Docker 상태 확인
 ```bash
-docker compose ps
+docker-compose ps
 docker ps
 docker images
 ```

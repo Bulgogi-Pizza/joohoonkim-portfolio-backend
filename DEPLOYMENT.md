@@ -141,7 +141,7 @@ TTL: 300
 ```bash
 # EC2 서버에 접속 후
 cd /home/ec2-user/portfolio-backend
-docker compose logs -f
+docker-compose logs -f
 
 # Nginx 로그
 sudo tail -f /var/log/nginx/error.log
@@ -151,7 +151,7 @@ sudo tail -f /var/log/nginx/access.log
 ### 컨테이너 재시작
 ```bash
 cd /home/ec2-user/portfolio-backend
-docker compose restart
+docker-compose restart
 ```
 
 ### SSL 인증서 수동 갱신
@@ -162,8 +162,8 @@ sudo systemctl reload nginx
 
 ### 컨테이너 상태 확인
 ```bash
-docker compose ps
-docker compose logs
+docker-compose ps
+docker-compose logs
 docker ps
 ```
 

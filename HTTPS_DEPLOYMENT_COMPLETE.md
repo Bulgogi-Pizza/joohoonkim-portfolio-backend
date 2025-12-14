@@ -157,11 +157,11 @@ curl https://api.joohoonkim.site/health
    sudo certbot --nginx -d api.joohoonkim.site
    ```
 
-### Docker 컨테이너가 시작되지 않음
+### Docker 컨테이너 로그 확인
 ```bash
-cd /home/ubuntu/portfolio-backend
-docker compose logs -f
-# 에러 로그 확인 후 환경 변수 또는 코드 수정
+ssh -i joohoonkim-portfolio-backend-main-key.pem ec2-user@13.209.8.80
+cd /home/ec2-user/portfolio-backend
+docker-compose logs -f
 ```
 
 ### Nginx 502 Bad Gateway
@@ -169,8 +169,8 @@ docker compose logs -f
 
 **해결책**:
 ```bash
-docker compose ps  # 컨테이너 상태 확인
-docker compose up -d  # 컨테이너 재시작
+docker-compose ps  # 컨테이너 상태 확인
+docker-compose up -d  # 컨테이너 재시작
 ```
 
 ### CORS 에러
