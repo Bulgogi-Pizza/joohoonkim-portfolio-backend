@@ -90,15 +90,41 @@ jobs:
             sudo nginx -t && sudo systemctl restart nginx
             
             # Docker Compose로 배포
+            echo "📦 Stopping existing containers..."
             docker-compose down || true
-            docker-compose pull || true
-            docker-compose build
+            
+            echo "🔨 Building Docker image..."
+            # 레거시 빌더 사용 (buildx 버전 문제 해결)
+            DOCKER_BUILDKIT=0 docker-compose build --no-cache
+            
+            echo "🚀 Starting containers..."
             docker-compose up -d
+            
+            # 컨테이너 상태 확인
+            echo "📊 Container status:"
+            docker-compose ps
+            docker ps -a
+            
+            # 로그 확인
+            echo "📝 Container logs:"
+            docker-compose logs --tail=50
+            
+            # 컨테이너 헬스체크 대기
+            echo "⏳ Waiting for container to be healthy..."
+            sleep 10
+            
+            # 로컬 API 테스트
+            echo "🔍 Testing local API..."
+            curl -f http://localhost:8000/health || echo "⚠️  API not responding yet"
             
             # SSL 인증서 설정 (처음 한 번만 실행됨)
             if [ ! -f "/etc/letsencrypt/live/${{ env.BACKEND_DOMAIN }}/fullchain.pem" ]; then
               echo "🔐 SSL 인증서 발급 중..."
-              sudo certbot --nginx -d ${{ env.BACKEND_DOMAIN }} --non-interactive --agree-tos -m ${{ secrets.CERTBOT_EMAIL }}
+              echo "⏳ Waiting for Nginx to be ready..."
+              sleep 5
+              sudo certbot --nginx -d ${{ env.BACKEND_DOMAIN }} --non-interactive --agree-tos -m ${{ secrets.CERTBOT_EMAIL }} || echo "⚠️  SSL 인증서 발급 실패 - 나중에 수동으로 발급하세요"
+            else
+              echo "✅ SSL 인증서가 이미 존재합니다"
             fi
             
             # 오래된 이미지 정리
