@@ -17,16 +17,15 @@ jobs:
         run: |
           echo "ENV=prod" >> $GITHUB_ENV
           echo "EC2_HOST=13.209.8.80" >> $GITHUB_ENV
-          echo "EC2_KEY=${{ secrets.EC2_PROD_KEY }}" >> $GITHUB_ENV
           echo "FRONTEND_ORIGIN=https://main.d1jx5u7u0ebuxt.amplifyapp.com,https://dev.d1jx5u7u0ebuxt.amplifyapp.com" >> $GITHUB_ENV
           echo "BACKEND_DOMAIN=api.joohoonkim.site" >> $GITHUB_ENV
 
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ env.EC2_KEY }}" > ~/.ssh/deploy_key
+          echo "${{ secrets.EC2_PROD_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H ${{ env.EC2_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H 13.209.8.80 >> ~/.ssh/known_hosts
 
       - name: Deploy to EC2
         run: |
