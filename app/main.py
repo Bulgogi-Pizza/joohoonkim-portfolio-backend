@@ -15,8 +15,11 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
 load_dotenv()
-FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN")
+FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "")
 SECRET_KEY = os.getenv("SECRET_KEY")
+
+# FRONTEND_ORIGIN이 쉼표로 구분된 여러 URL일 수 있음
+allowed_origins = [origin.strip() for origin in FRONTEND_ORIGIN.split(",") if origin.strip()]
 
 
 @asynccontextmanager
@@ -58,7 +61,7 @@ app.add_middleware(
 # CORS 미들웨어 설정
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[FRONTEND_ORIGIN],
+    allow_origins=allowed_origins,  # 여러 origin 지원
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

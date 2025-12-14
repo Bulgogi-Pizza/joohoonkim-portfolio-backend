@@ -1,0 +1,119 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set environment variables
+        run: |
+          echo "ENV=prod" >> $GITHUB_ENV
+          echo "EC2_HOST=13.209.8.80" >> $GITHUB_ENV
+          echo "EC2_KEY=${{ secrets.EC2_PROD_KEY }}" >> $GITHUB_ENV
+          echo "FRONTEND_ORIGIN=https://main.d1jx5u7u0ebuxt.amplifyapp.com,https://dev.d1jx5u7u0ebuxt.amplifyapp.com" >> $GITHUB_ENV
+          echo "BACKEND_DOMAIN=api.joohoonkim.site" >> $GITHUB_ENV
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ env.EC2_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ env.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to EC2
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ec2-user@${{ env.EC2_HOST }} << 'EOF'
+            # 배포 디렉토리 설정
+            DEPLOY_DIR="/home/ec2-user/portfolio-backend"
+            
+            # 디렉토리 생성
+            mkdir -p $DEPLOY_DIR
+            cd $DEPLOY_DIR
+            
+            # Git 저장소 초기화 또는 업데이트
+            if [ ! -d ".git" ]; then
+              git clone https://github.com/${{ github.repository }}.git .
+            fi
+            
+            # 최신 코드 가져오기
+            git fetch --all
+            git reset --hard origin/${{ github.ref_name }}
+            
+            # 환경 변수 파일 생성
+            cat > .env << 'ENVEOF'
+          DATABASE_URL=${{ secrets.DATABASE_URL }}
+          CERTBOT_EMAIL=${{ secrets.CERTBOT_EMAIL }}
+          DB_NAME=${{ secrets.DB_NAME }}
+          DB_USER=${{ secrets.DB_USER }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          SECRET_KEY=${{ secrets.SECRET_KEY }}
+          ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}
+          ADMIN_PASSWORD_HASH=${{ secrets.ADMIN_PASSWORD_HASH }}
+          FRONTEND_ORIGIN=${{ env.FRONTEND_ORIGIN }}
+          AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION=${{ secrets.AWS_REGION }}
+          ENVEOF
+            
+            # Nginx 설정
+            sudo tee /etc/nginx/conf.d/portfolio-backend.conf > /dev/null << 'NGINXEOF'
+          server {
+              listen 80;
+              server_name ${{ env.BACKEND_DOMAIN }};
+
+              location / {
+                  proxy_pass http://localhost:8000;
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade $http_upgrade;
+                  proxy_set_header Connection 'upgrade';
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+                  proxy_cache_bypass $http_upgrade;
+              }
+
+              location /static {
+                  proxy_pass http://localhost:8000/static;
+              }
+          }
+          NGINXEOF
+            
+            # Nginx 설정 테스트 및 재시작
+            sudo nginx -t && sudo systemctl restart nginx
+            
+            # Docker Compose로 배포
+            docker compose down || true
+            docker compose pull || true
+            docker compose build
+            docker compose up -d
+            
+            # SSL 인증서 설정 (처음 한 번만 실행됨)
+            if [ ! -f "/etc/letsencrypt/live/${{ env.BACKEND_DOMAIN }}/fullchain.pem" ]; then
+              echo "🔐 SSL 인증서 발급 중..."
+              sudo certbot --nginx -d ${{ env.BACKEND_DOMAIN }} --non-interactive --agree-tos -m ${{ secrets.CERTBOT_EMAIL }}
+            fi
+            
+            # 오래된 이미지 정리
+            docker system prune -f
+            
+            echo "✅ Deployment completed!"
+            echo "🌐 Backend URL: https://${{ env.BACKEND_DOMAIN }}"
+          EOF
+
+      - name: Verify deployment
+        run: |
+          echo "🎉 Deployment completed!"
+          echo "Environment: Production"
+          echo "EC2 Host: ${{ env.EC2_HOST }}"
+          echo "Backend URL: https://${{ env.BACKEND_DOMAIN }}"
+          echo "Frontend Origins: ${{ env.FRONTEND_ORIGIN }}"
+

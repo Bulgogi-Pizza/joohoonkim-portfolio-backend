@@ -135,6 +135,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
+.env.local
 .env
 .envrc
 .venv
@@ -143,6 +144,11 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# SSH Keys
+*.pem
+*.key
+id_rsa*
 
 # Spyder project settings
 .spyderproject
