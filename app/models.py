@@ -231,3 +231,19 @@ class CoverArt(SQLModel, table=True):
     is_active: bool = Field(default=True)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class HeroContent(SQLModel, table=True):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    title: str  # "Innovating"
+    title_highlight: str  # "Nanophotonics"
+    description: str
+    cta_primary_text: str = Field(default="Explore Research")
+    cta_primary_link: str = Field(default="/research")
+    cta_secondary_text: str = Field(default="View CV")
+    cta_secondary_link: str = Field(default="/cv")
+    is_active: bool = Field(default=True)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)

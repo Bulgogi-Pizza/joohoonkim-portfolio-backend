@@ -6,6 +6,7 @@ from typing import List, Optional
 from app.database import get_db
 from app.models import RepresentativeWork
 from app.security.security import require_admin
+from app.utils.s3 import upload_file_to_s3
 from fastapi import APIRouter, Depends, HTTPException, File, UploadFile
 from sqlalchemy.orm import Session
 
@@ -13,11 +14,12 @@ router = APIRouter(prefix="/api/representative-works",
                    tags=["representative-works"])
 
 # 업로드 디렉토리 설정
-UPLOAD_DIR = Path("../frontend/static/uploads")
-UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+# UPLOAD_DIR is no longer needed with S3
+# UPLOAD_DIR = Path("../frontend/static/uploads")
+# UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 
-@router.get("/", response_model=List[RepresentativeWork])
+@router.get("", response_model=List[RepresentativeWork])
 def get_representative_works(
     active_only: bool = True,
     db: Session = Depends(get_db)
@@ -96,16 +98,12 @@ async def upload_image(file: UploadFile = File(...),
     if not file.content_type.startswith('image/'):
         raise HTTPException(status_code=400, detail="File must be an image")
 
-    # 파일명 생성 (타임스탬프 + 원본 파일명)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"{timestamp}_{file.filename}"
-    file_path = UPLOAD_DIR / filename
-
-    # 파일 저장
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-
-    return {"image_path": f"static/uploads/{filename}"}
+    try:
+        # Upload to S3 (representative-works folder)
+        s3_url = await upload_file_to_s3(file, folder="representative-works")
+        return {"image_path": s3_url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/gallery/")

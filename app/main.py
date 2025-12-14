@@ -7,7 +7,7 @@ from app.database import create_db_and_tables, test_db_connection
 # 라우터 import
 from app.routers import publications, education, experience, awards, \
     conferences, media, representative_works, research_areas, cv_markdown, cv, \
-    research_highlights, cover_arts, auth, sitemap
+    research_highlights, cover_arts, auth, sitemap, hero
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -42,7 +42,8 @@ app = FastAPI(
     title="JoohoonKim Portfolio API",
     description="Portfolio API for JoohoonKim's academic website",
     version="1.0.0",
-    lifespan=lifespan
+    lifespan=lifespan,
+    redirect_slashes=False
 )
 
 # 쿠키 세션
@@ -66,13 +67,19 @@ app.add_middleware(
 # 라우터 등록
 app.include_router(publications.router)
 app.include_router(awards.router)
+app.include_router(education.router)
+app.include_router(experience.router)
 app.include_router(conferences.router)
+app.include_router(media.router)
 app.include_router(representative_works.router)
 app.include_router(research_areas.router)
 app.include_router(research_highlights.router)
 app.include_router(cover_arts.router)
+app.include_router(cv.router)
+app.include_router(cv_markdown.router)
 app.include_router(auth.router)
 app.include_router(sitemap.router)
+app.include_router(hero.router)
 
 # 정적 파일 서빙
 app.mount("/static", StaticFiles(directory="static"), name="static")

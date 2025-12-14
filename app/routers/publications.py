@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 router = APIRouter(prefix="/api/publications", tags=["publications"])
 
 
-@router.get("/", response_model=List[Publication])
+@router.get("", response_model=List[Publication])
 def get_publications(
     year: Optional[str] = Query(None, description="Filter by year"),
     contribution: Optional[str] = Query(None,

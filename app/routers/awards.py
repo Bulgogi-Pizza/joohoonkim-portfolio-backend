@@ -10,7 +10,7 @@ from ..security.security import require_admin
 router = APIRouter(prefix="/api/awards", tags=["awards"])
 
 
-@router.get("/", response_model=List[Award])
+@router.get("", response_model=List[Award])
 def get_awards(db: Session = Depends(get_db)):
     return db.query(Award).order_by(Award.year.desc()).all()
 

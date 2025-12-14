@@ -1,3 +1,4 @@
+
 import re
 import shutil
 from datetime import datetime
@@ -7,21 +8,21 @@ from typing import List
 from app.database import get_db
 from app.models import ResearchArea
 from app.security.security import require_admin
+from app.utils.s3 import upload_file_to_s3
 from fastapi import APIRouter, Depends, HTTPException, File, UploadFile
 from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/api/research-areas", tags=["research-areas"])
 
 # 업로드 디렉토리 설정
-UPLOAD_DIR = Path("../frontend/static/uploads/icons")
-UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+# UPLOAD_DIR and CONTENT_UPLOAD_DIR are no longer needed with S3
+# UPLOAD_DIR = Path("../frontend/static/uploads/icons")
+# UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+# CONTENT_UPLOAD_DIR = Path("../frontend/static/uploads/research-areas")
+# CONTENT_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
-# NEW: 본문 이미지 업로드 디렉토리
-CONTENT_UPLOAD_DIR = Path("../frontend/static/uploads/research-areas")
-CONTENT_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
-
-@router.get("/", response_model=List[ResearchArea])
+@router.get("", response_model=List[ResearchArea])
 def get_research_areas(
     active_only: bool = True,
     db: Session = Depends(get_db)
@@ -96,15 +97,12 @@ async def upload_icon(file: UploadFile = File(...),
     if not file.content_type.startswith('image/'):
         raise HTTPException(status_code=400, detail="File must be an image")
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    safe = re.sub(r'[^A-Za-z0-9_.-]', '_', file.filename)
-    filename = f"{timestamp}_{safe}"
-    file_path = UPLOAD_DIR / filename
-
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-
-    return {"icon_path": f"/static/uploads/icons/{filename}"}
+    try:
+        # Upload to S3 (icons folder)
+        s3_url = await upload_file_to_s3(file, folder="icons")
+        return {"icon_path": s3_url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # NEW: 본문 이미지 업로드
@@ -115,13 +113,9 @@ async def upload_content_image(file: UploadFile = File(...),
     if not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="File must be an image")
 
-    timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
-    safe = re.sub(r'[^A-Za-z0-9_.-]', '_', file.filename)
-    filename = f"{timestamp}_{safe}"
-    file_path = CONTENT_UPLOAD_DIR / filename
-
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-
-    # 프론트에서 Markdown으로 바로 삽입하기 좋은 절대 경로 반환
-    return {"image_path": f"/static/uploads/research-areas/{filename}"}
+    try:
+        # Upload to S3 (research-areas folder)
+        s3_url = await upload_file_to_s3(file, folder="research-areas")
+        return {"image_path": s3_url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

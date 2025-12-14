@@ -1,9 +1,12 @@
+
+
 import os
 import shutil
 from datetime import datetime
 from typing import List, Optional
 
 from app.security.security import require_admin
+from app.utils.s3 import upload_file_to_s3
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlmodel import Session, select, SQLModel
 
@@ -148,17 +151,15 @@ async def create_or_update_cv_profile(
 @router.post("/upload-image")
 async def upload_profile_image(file: UploadFile = File(...),
     admin: bool = Depends(require_admin)):
-    # 업로드 디렉토리 생성
-    upload_dir = "../frontend/static/uploads/profiles"
-    os.makedirs(upload_dir, exist_ok=True)
-
-    # 파일 저장
-    file_path = os.path.join(upload_dir,
-                             f"{datetime.now().timestamp()}_{file.filename}")
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-
-    return {"image_url": f"/{file_path}"}
+    
+    try:
+        # Upload to S3 (profiles folder)
+        s3_url = await upload_file_to_s3(file, folder="profiles")
+        # Return path relative to what frontend expects or full URL
+        # Frontend might expect /static/... but with S3 we return full URL
+        return {"image_path": s3_url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # 기존 마크다운 CV와의 호환성 유지

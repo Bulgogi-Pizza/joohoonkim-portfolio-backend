@@ -10,7 +10,7 @@ from ..models import Conference
 router = APIRouter(prefix="/api/conferences", tags=["conferences"])
 
 
-@router.get("/", response_model=List[Conference])
+@router.get("", response_model=List[Conference])
 def get_conferences(db: Session = Depends(get_db)):
     return db.query(Conference).order_by(Conference.date.desc()).all()
 

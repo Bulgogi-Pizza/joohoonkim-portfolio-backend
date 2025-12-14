@@ -10,7 +10,7 @@ from ..models import Experience
 router = APIRouter(prefix="/api/experience", tags=["experience"])
 
 
-@router.get("/", response_model=List[Experience])
+@router.get("", response_model=List[Experience])
 def get_experience(db: Session = Depends(get_db)):
     return db.query(Experience).all()
 

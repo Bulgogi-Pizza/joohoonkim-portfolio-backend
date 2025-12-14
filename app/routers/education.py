@@ -10,7 +10,7 @@ from ..models import Education
 router = APIRouter(prefix="/api/education", tags=["education"])
 
 
-@router.get("/", response_model=List[Education])
+@router.get("", response_model=List[Education])
 def get_education(db: Session = Depends(get_db)):
     return db.query(Education).all()
 
