@@ -75,6 +75,7 @@ class Publication(SQLModel, table=True):
     # 추가 정보
     impact_factor: Optional[float] = None
     featured_info: Optional[str] = None  # Cover article, News & Views 등
+    image_path: Optional[str] = None  # 논문 커버 이미지 또는 그래픽
 
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)

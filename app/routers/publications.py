@@ -4,7 +4,8 @@ from typing import List, Optional
 from app.database import get_db
 from app.models import Publication
 from app.security.security import require_admin
-from fastapi import APIRouter, Depends, HTTPException, Query
+from app.utils.s3 import upload_file_to_s3
+from fastapi import APIRouter, Depends, HTTPException, Query, File, UploadFile
 from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/api/publications", tags=["publications"])
@@ -123,3 +124,26 @@ def delete_publication(publication_id: int, db: Session = Depends(get_db),
     db.delete(publication)
     db.commit()
     return {"message": "Publication deleted successfully"}
+
+
+@router.post("/upload-image")
+async def upload_publication_image(
+    file: UploadFile = File(...),
+    admin: bool = Depends(require_admin)
+):
+    """
+    논문 커버 이미지 또는 그래픽 업로드
+
+    - S3 publications 폴더에 업로드
+    - 업로드된 이미지 URL 반환
+    """
+    if not file.content_type.startswith('image/'):
+        raise HTTPException(status_code=400, detail="File must be an image")
+
+    try:
+        # Upload to S3 (publications folder)
+        s3_url = await upload_file_to_s3(file, folder="publications")
+        return {"image_path": s3_url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
