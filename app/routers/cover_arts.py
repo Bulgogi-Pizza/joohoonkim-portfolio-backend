@@ -40,7 +40,7 @@ def get_cover_art(item_id: int, db: Session = Depends(get_db)):
     return item
 
 
-@router.post("/", response_model=CoverArt)
+@router.post("", response_model=CoverArt)
 def create_cover_art(item: CoverArt, db: Session = Depends(get_db),
     admin: bool = Depends(require_admin)):
     item.updated_at = datetime.utcnow()

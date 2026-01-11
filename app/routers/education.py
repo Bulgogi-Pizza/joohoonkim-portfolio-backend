@@ -24,7 +24,7 @@ def get_education_item(education_id: int, db: Session = Depends(get_db)):
 
 
 # Admin CRUD operations
-@router.post("/", response_model=Education)
+@router.post("", response_model=Education)
 def create_education(education: Education, db: Session = Depends(get_db),
     admin: bool = Depends(require_admin)
 ):

@@ -43,7 +43,7 @@ def get_research_highlight(item_id: int, db: Session = Depends(get_db)):
     return item
 
 
-@router.post("/", response_model=ResearchHighlight)
+@router.post("", response_model=ResearchHighlight)
 def create_research_highlight(item: ResearchHighlight,
     db: Session = Depends(get_db),
     admin: bool = Depends(require_admin)

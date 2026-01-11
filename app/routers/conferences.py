@@ -15,7 +15,7 @@ def get_conferences(db: Session = Depends(get_db)):
     return db.query(Conference).order_by(Conference.date.desc()).all()
 
 
-@router.post("/", response_model=Conference)
+@router.post("", response_model=Conference)
 def create_conference(conference: Conference, db: Session = Depends(get_db),
     admin: bool = Depends(require_admin)):
     db.add(conference)

@@ -41,7 +41,7 @@ def get_research_area(slug: str, db: Session = Depends(get_db)):
     return area
 
 
-@router.post("/", response_model=ResearchArea)
+@router.post("", response_model=ResearchArea)
 def create_research_area(area_data: ResearchArea,
     db: Session = Depends(get_db),
     admin: bool = Depends(require_admin)

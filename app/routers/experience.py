@@ -15,7 +15,7 @@ def get_experience(db: Session = Depends(get_db)):
     return db.query(Experience).all()
 
 
-@router.post("/", response_model=Experience)
+@router.post("", response_model=Experience)
 def create_experience(experience: Experience, db: Session = Depends(get_db),
     admin: bool = Depends(require_admin)):
     db.add(experience)

@@ -41,7 +41,7 @@ def get_representative_work(work_id: int, db: Session = Depends(get_db)
     return work
 
 
-@router.post("/", response_model=RepresentativeWork)
+@router.post("", response_model=RepresentativeWork)
 def create_representative_work(work: RepresentativeWork,
     db: Session = Depends(get_db),
     admin: bool = Depends(require_admin)

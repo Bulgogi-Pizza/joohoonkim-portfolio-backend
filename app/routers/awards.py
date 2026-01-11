@@ -15,7 +15,7 @@ def get_awards(db: Session = Depends(get_db)):
     return db.query(Award).order_by(Award.year.desc()).all()
 
 
-@router.post("/", response_model=Award)
+@router.post("", response_model=Award)
 def create_award(
     award: Award,
     db: Session = Depends(get_db),

@@ -81,7 +81,7 @@ def get_publication(publication_id: int, db: Session = Depends(get_db)):
 
 
 # Admin CRUD operations
-@router.post("/", response_model=Publication)
+@router.post("", response_model=Publication)
 def create_publication(publication: Publication, db: Session = Depends(get_db),
     admin: bool = Depends(require_admin)
 ):
