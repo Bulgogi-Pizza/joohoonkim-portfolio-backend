@@ -6,6 +6,7 @@ from app.models import Publication
 from app.security.security import require_admin
 from app.utils.s3 import upload_file_to_s3
 from fastapi import APIRouter, Depends, HTTPException, Query, File, UploadFile
+from sqlalchemy import nullslast
 from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/api/publications", tags=["publications"])
@@ -46,6 +47,8 @@ def get_publications(
     if status:
         query = query.filter(Publication.status == status)
 
+    if show_in_cv:
+        return query.order_by(nullslast(Publication.cv_order.asc())).all()
     return query.order_by(Publication.number.desc()).all()
 
 

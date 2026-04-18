@@ -3,6 +3,7 @@ from typing import List
 
 from app.security.security import require_admin
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import nullslast
 from sqlalchemy.orm import Session
 
 from ..database import get_db
@@ -13,7 +14,7 @@ router = APIRouter(prefix="/api/cv-services", tags=["cv-services"])
 
 @router.get("", response_model=List[CVService])
 def get_cv_services(db: Session = Depends(get_db)):
-    return db.query(CVService).order_by(CVService.order_index.asc()).all()
+    return db.query(CVService).order_by(nullslast(CVService.cv_order.asc()), CVService.order_index.asc()).all()
 
 
 @router.get("/{service_id}", response_model=CVService)

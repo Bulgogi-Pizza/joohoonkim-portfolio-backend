@@ -2,6 +2,7 @@ from typing import List, Optional
 
 from app.security.security import require_admin
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import nullslast
 from sqlalchemy.orm import Session
 
 from ..database import get_db
@@ -18,6 +19,7 @@ def get_education(
     query = db.query(Education)
     if show_in_cv is not None:
         query = query.filter(Education.show_in_cv == show_in_cv)
+        return query.order_by(nullslast(Education.cv_order.asc())).all()
     return query.all()
 
 

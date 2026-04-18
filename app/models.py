@@ -17,6 +17,7 @@ class Education(SQLModel, table=True):
     advisor: Optional[str] = None
     description: Optional[str] = None
     show_in_cv: bool = Field(default=False)
+    cv_order: Optional[int] = Field(default=None)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 
@@ -32,6 +33,7 @@ class Experience(SQLModel, table=True):
     description: Optional[str] = None
     host_advisor: Optional[str] = None
     show_in_cv: bool = Field(default=False)
+    cv_order: Optional[int] = Field(default=None)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 
@@ -46,6 +48,7 @@ class Award(SQLModel, table=True):
     rank: Optional[str] = None
     description: Optional[str] = None
     show_in_cv: bool = Field(default=False)
+    cv_order: Optional[int] = Field(default=None)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 
@@ -80,6 +83,7 @@ class Publication(SQLModel, table=True):
     featured_info: Optional[str] = None  # Cover article, News & Views 등
     image_path: Optional[str] = None  # 논문 커버 이미지 또는 그래픽
     show_in_cv: bool = Field(default=False)
+    cv_order: Optional[int] = Field(default=None)
 
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
@@ -245,6 +249,7 @@ class CVService(SQLModel, table=True):
     title: str
     description: str
     order_index: int = Field(default=0)
+    cv_order: Optional[int] = Field(default=None)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 

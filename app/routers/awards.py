@@ -1,6 +1,7 @@
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import nullslast
 from sqlalchemy.orm import Session
 
 from ..database import get_db
@@ -18,6 +19,7 @@ def get_awards(
     query = db.query(Award)
     if show_in_cv is not None:
         query = query.filter(Award.show_in_cv == show_in_cv)
+        return query.order_by(nullslast(Award.cv_order.asc())).all()
     return query.order_by(Award.year.desc()).all()
 
 
