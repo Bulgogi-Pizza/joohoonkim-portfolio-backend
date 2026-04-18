@@ -18,12 +18,16 @@ def get_publications(
                                         description="Filter by contribution type: first-author, corresponding, co-author"),
     status: Optional[str] = Query(None,
                                   description="Filter by status: published, under-submission, in-press, in-review"),
+    show_in_cv: Optional[bool] = Query(None),
     db: Session = Depends(get_db)
 ):
     query = db.query(Publication)
 
     if year:
         query = query.filter(Publication.year == year)
+
+    if show_in_cv is not None:
+        query = query.filter(Publication.show_in_cv == show_in_cv)
 
     if contribution:
         if contribution == "first-author":

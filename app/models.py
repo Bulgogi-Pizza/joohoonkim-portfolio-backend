@@ -16,6 +16,7 @@ class Education(SQLModel, table=True):
     end_year: str
     advisor: Optional[str] = None
     description: Optional[str] = None
+    show_in_cv: bool = Field(default=False)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 
@@ -30,6 +31,7 @@ class Experience(SQLModel, table=True):
     end_year: str
     description: Optional[str] = None
     host_advisor: Optional[str] = None
+    show_in_cv: bool = Field(default=False)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 
@@ -43,6 +45,7 @@ class Award(SQLModel, table=True):
     year: str
     rank: Optional[str] = None
     description: Optional[str] = None
+    show_in_cv: bool = Field(default=False)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 
@@ -76,6 +79,7 @@ class Publication(SQLModel, table=True):
     impact_factor: Optional[float] = None
     featured_info: Optional[str] = None  # Cover article, News & Views 등
     image_path: Optional[str] = None  # 논문 커버 이미지 또는 그래픽
+    show_in_cv: bool = Field(default=False)
 
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)

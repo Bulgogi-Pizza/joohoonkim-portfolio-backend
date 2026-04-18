@@ -1,7 +1,7 @@
-from typing import List
+from typing import List, Optional
 
 from app.security.security import require_admin
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from ..database import get_db
@@ -11,8 +11,14 @@ router = APIRouter(prefix="/api/education", tags=["education"])
 
 
 @router.get("", response_model=List[Education])
-def get_education(db: Session = Depends(get_db)):
-    return db.query(Education).all()
+def get_education(
+    show_in_cv: Optional[bool] = Query(None),
+    db: Session = Depends(get_db),
+):
+    query = db.query(Education)
+    if show_in_cv is not None:
+        query = query.filter(Education.show_in_cv == show_in_cv)
+    return query.all()
 
 
 @router.get("/{education_id}", response_model=Education)

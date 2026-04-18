@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from ..database import get_db
@@ -11,8 +11,14 @@ router = APIRouter(prefix="/api/awards", tags=["awards"])
 
 
 @router.get("", response_model=List[Award])
-def get_awards(db: Session = Depends(get_db)):
-    return db.query(Award).order_by(Award.year.desc()).all()
+def get_awards(
+    show_in_cv: Optional[bool] = Query(None),
+    db: Session = Depends(get_db),
+):
+    query = db.query(Award)
+    if show_in_cv is not None:
+        query = query.filter(Award.show_in_cv == show_in_cv)
+    return query.order_by(Award.year.desc()).all()
 
 
 @router.post("", response_model=Award)

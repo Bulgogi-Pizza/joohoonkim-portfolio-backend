@@ -1,7 +1,7 @@
-from typing import List
+from typing import List, Optional
 
 from app.security.security import require_admin
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from ..database import get_db
@@ -11,8 +11,14 @@ router = APIRouter(prefix="/api/experience", tags=["experience"])
 
 
 @router.get("", response_model=List[Experience])
-def get_experience(db: Session = Depends(get_db)):
-    return db.query(Experience).all()
+def get_experience(
+    show_in_cv: Optional[bool] = Query(None),
+    db: Session = Depends(get_db),
+):
+    query = db.query(Experience)
+    if show_in_cv is not None:
+        query = query.filter(Experience.show_in_cv == show_in_cv)
+    return query.all()
 
 
 @router.post("", response_model=Experience)
