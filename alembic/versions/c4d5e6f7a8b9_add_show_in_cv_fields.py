@@ -46,8 +46,7 @@ def upgrade() -> None:
     # 원본 CV에 있던 12개 논문만 show_in_cv=True
     for title in CV_PUBLICATION_TITLES:
         op.execute(
-            sa.text("UPDATE publication SET show_in_cv = TRUE WHERE title = :title"),
-            {"title": title},
+            sa.text("UPDATE publication SET show_in_cv = TRUE WHERE title = :title").bindparams(title=title)
         )
 
 
