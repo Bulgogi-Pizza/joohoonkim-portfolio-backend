@@ -7,7 +7,7 @@ from app.database import create_db_and_tables, test_db_connection
 # 라우터 import
 from app.routers import publications, education, experience, awards, \
     conferences, media, representative_works, research_areas, cv_markdown, cv, \
-    research_highlights, cover_arts, auth, sitemap, hero
+    cv_services, research_highlights, cover_arts, auth, sitemap, hero
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -79,6 +79,7 @@ app.include_router(research_areas.router)
 app.include_router(research_highlights.router)
 app.include_router(cover_arts.router)
 app.include_router(cv.router)
+app.include_router(cv_services.router)
 app.include_router(cv_markdown.router)
 app.include_router(auth.router)
 app.include_router(sitemap.router)

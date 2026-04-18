@@ -147,6 +147,46 @@ async def create_or_update_cv_profile(
     return await get_active_cv_profile(session)
 
 
+# CV 프로필 수정 (관리자용)
+@router.put("/profile/{profile_id}", response_model=CVProfileResponse)
+async def update_cv_profile(
+    profile_id: int,
+    profile_data: CVProfileCreate,
+    session: Session = Depends(get_db),
+    admin: bool = Depends(require_admin),
+):
+    profile = session.get(CVProfile, profile_id)
+    if not profile:
+        raise HTTPException(status_code=404, detail="CV profile not found")
+
+    profile.name = profile_data.name
+    profile.title = profile_data.title
+    profile.bio = profile_data.bio
+    profile.profile_image = profile_data.profile_image
+    profile.updated_at = datetime.utcnow()
+    session.add(profile)
+
+    # 기존 연락처 정보 삭제 후 재생성
+    existing_contacts = session.exec(
+        select(ContactInfo).where(ContactInfo.profile_id == profile_id)
+    ).all()
+    for c in existing_contacts:
+        session.delete(c)
+
+    for contact_data in profile_data.contact_info:
+        contact = ContactInfo(
+            profile_id=profile_id,
+            label=contact_data.label,
+            value=contact_data.value,
+            data_type=contact_data.data_type,
+            order_index=contact_data.order_index,
+        )
+        session.add(contact)
+
+    session.commit()
+    return await get_active_cv_profile(session)
+
+
 # 프로필 이미지 업로드
 @router.post("/upload-image")
 async def upload_profile_image(file: UploadFile = File(...),
