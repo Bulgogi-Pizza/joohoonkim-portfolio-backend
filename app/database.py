@@ -12,8 +12,11 @@ if not DATABASE_URL:
 # SQLModel/SQLAlchemy 엔진 생성
 engine = create_engine(
     DATABASE_URL,
-    echo=True,  # SQL 쿼리 로깅 (개발 환경에서 유용)
-    pool_pre_ping=True  # 연결 상태 확인
+    echo=True,
+    pool_pre_ping=True,
+    pool_recycle=1800,   # 30분마다 연결 재활용 (idle 연결 만료 방지)
+    pool_size=5,
+    max_overflow=10,
 )
 
 # 세션 팩토리 생성
