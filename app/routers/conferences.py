@@ -2,6 +2,7 @@ from typing import List
 
 from app.security.security import require_admin
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import nullslast
 from sqlalchemy.orm import Session
 
 from ..database import get_db
@@ -12,13 +13,17 @@ router = APIRouter(prefix="/api/conferences", tags=["conferences"])
 
 @router.get("", response_model=List[Conference])
 def get_conferences(db: Session = Depends(get_db)):
-    return db.query(Conference).order_by(Conference.date.desc()).all()
+    return db.query(Conference).order_by(
+        nullslast(Conference.order_index.desc())).all()
 
 
 @router.post("", response_model=Conference)
 def create_conference(conference: Conference, db: Session = Depends(get_db),
     admin: bool = Depends(require_admin)):
     db.add(conference)
+    db.flush()
+    if conference.order_index is None:
+        conference.order_index = conference.id
     db.commit()
     db.refresh(conference)
     return conference

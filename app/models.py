@@ -49,6 +49,7 @@ class Award(SQLModel, table=True):
     description: Optional[str] = None
     show_in_cv: bool = Field(default=False)
     cv_order: Optional[int] = Field(default=None)
+    order_index: Optional[int] = Field(default=None)  # 공개 페이지 수동 정렬 (생성 시 id로 초기화)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 
@@ -100,6 +101,7 @@ class Conference(SQLModel, table=True):
     presentation_type: str
     award: Optional[str] = None
     description: Optional[str] = None
+    order_index: Optional[int] = Field(default=None)  # 공개 페이지 수동 정렬 (생성 시 id로 초기화)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 

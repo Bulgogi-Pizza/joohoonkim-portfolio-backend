@@ -757,7 +757,7 @@ file: <image file>
 GET /api/conferences
 ```
 
-**Response (200 OK):**
+**Response (200 OK):** `order_index` 내림차순 정렬 (NULLS LAST)
 ```json
 [
   {
@@ -767,6 +767,7 @@ GET /api/conferences
     "date": "2024-05-05",
     "presentation_type": "Oral",
     "award": "Best Student Paper",
+    "order_index": 1,
     "created_at": "2024-01-15T10:30:00Z",
     "updated_at": "2024-01-15T10:30:00Z"
   }
@@ -782,14 +783,15 @@ Content-Type: application/json
 Authorization: Required (Session Cookie)
 ```
 
-**Request Body:**
+**Request Body:** `order_index` 생략 시 생성된 행의 `id` 값으로 자동 설정
 ```json
 {
   "conference_name": "CLEO 2024",
   "location": "Charlotte, USA",
   "date": "2024-05-05",
   "presentation_type": "Oral",
-  "award": "Best Student Paper"
+  "award": "Best Student Paper",
+  "order_index": 1
 }
 ```
 
@@ -832,7 +834,7 @@ Authorization: Required (Session Cookie)
 GET /api/awards
 ```
 
-**Response (200 OK):**
+**Response (200 OK):** `order_index` 내림차순 정렬 (NULLS LAST). 단 `?show_in_cv=` 지정 시 `cv_order` 오름차순.
 ```json
 [
   {
@@ -841,6 +843,7 @@ GET /api/awards
     "organization": "Government of Korea",
     "details": "Ph.D.",
     "year": "2024",
+    "order_index": 1,
     "created_at": "2024-01-15T10:30:00Z",
     "updated_at": "2024-01-15T10:30:00Z"
   }
@@ -856,13 +859,14 @@ Content-Type: application/json
 Authorization: Required (Session Cookie)
 ```
 
-**Request Body:**
+**Request Body:** `order_index` 생략 시 생성된 행의 `id` 값으로 자동 설정
 ```json
 {
   "title": "Award Title",
   "organization": "Organization Name",
   "details": "Details",
-  "year": "2024"
+  "year": "2024",
+  "order_index": 1
 }
 ```
 

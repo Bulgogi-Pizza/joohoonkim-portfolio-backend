@@ -20,7 +20,7 @@ def get_awards(
     if show_in_cv is not None:
         query = query.filter(Award.show_in_cv == show_in_cv)
         return query.order_by(nullslast(Award.cv_order.asc())).all()
-    return query.order_by(Award.year.desc()).all()
+    return query.order_by(nullslast(Award.order_index.desc())).all()
 
 
 @router.post("", response_model=Award)
@@ -30,6 +30,9 @@ def create_award(
     admin: bool = Depends(require_admin)
 ):
     db.add(award)
+    db.flush()
+    if award.order_index is None:
+        award.order_index = award.id
     db.commit()
     db.refresh(award)
     return award
