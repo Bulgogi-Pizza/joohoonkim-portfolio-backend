@@ -757,7 +757,7 @@ file: <image file>
 GET /api/conferences
 ```
 
-**Response (200 OK):** `order_index` 내림차순 정렬 (NULLS LAST)
+**Response (200 OK):** `order_index` 오름차순 정렬 (NULLS LAST)
 ```json
 [
   {
@@ -783,7 +783,7 @@ Content-Type: application/json
 Authorization: Required (Session Cookie)
 ```
 
-**Request Body:** `order_index` 생략 시 생성된 행의 `id` 값으로 자동 설정
+**Request Body:** `order_index` 생략 시 생성된 행의 `id` 값으로 자동 설정 (오름차순 정렬이므로 맨 뒤에 추가됨)
 ```json
 {
   "conference_name": "CLEO 2024",
@@ -834,7 +834,7 @@ Authorization: Required (Session Cookie)
 GET /api/awards
 ```
 
-**Response (200 OK):** `order_index` 내림차순 정렬 (NULLS LAST). 단 `?show_in_cv=` 지정 시 `cv_order` 오름차순.
+**Response (200 OK):** `order_index` 오름차순 정렬 (NULLS LAST). 단 `?show_in_cv=` 지정 시 `cv_order` 오름차순.
 ```json
 [
   {
@@ -859,7 +859,7 @@ Content-Type: application/json
 Authorization: Required (Session Cookie)
 ```
 
-**Request Body:** `order_index` 생략 시 생성된 행의 `id` 값으로 자동 설정
+**Request Body:** `order_index` 생략 시 생성된 행의 `id` 값으로 자동 설정 (오름차순 정렬이므로 맨 뒤에 추가됨)
 ```json
 {
   "title": "Award Title",

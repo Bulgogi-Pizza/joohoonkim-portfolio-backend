@@ -14,7 +14,7 @@ router = APIRouter(prefix="/api/conferences", tags=["conferences"])
 @router.get("", response_model=List[Conference])
 def get_conferences(db: Session = Depends(get_db)):
     return db.query(Conference).order_by(
-        nullslast(Conference.order_index.desc())).all()
+        nullslast(Conference.order_index.asc())).all()
 
 
 @router.post("", response_model=Conference)
