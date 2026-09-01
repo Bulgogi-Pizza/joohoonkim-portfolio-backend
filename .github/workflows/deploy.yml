@@ -118,15 +118,14 @@ jobs:
             echo "🔍 Testing local API..."
             curl -f http://localhost:8000/health || echo "⚠️  API not responding yet"
             
-            # SSL 인증서 설정 (처음 한 번만 실행됨)
-            if [ ! -f "/etc/letsencrypt/live/${{ env.BACKEND_DOMAIN }}/fullchain.pem" ]; then
-              echo "🔐 SSL 인증서 발급 중..."
-              echo "⏳ Waiting for Nginx to be ready..."
-              sleep 5
-              sudo certbot --nginx -d ${{ env.BACKEND_DOMAIN }} --non-interactive --agree-tos -m ${{ secrets.CERTBOT_EMAIL }} || echo "⚠️  SSL 인증서 발급 실패 - 나중에 수동으로 발급하세요"
-            else
-              echo "✅ SSL 인증서가 이미 존재합니다"
-            fi
+            # SSL 설정: 위에서 nginx conf를 덮어쓰므로 certbot이 추가하는 443 블록도
+            # 함께 사라진다. 배포마다 실행해 443 블록을 복원한다.
+            # --keep-until-expiring: 인증서가 이미 있고 갱신 시점이 아니면 재발급하지
+            # 않고 설치만 하므로 Let's Encrypt 발급 한도를 소모하지 않는다.
+            echo "🔐 SSL 인증서 확인 및 설치 중..."
+            echo "⏳ Waiting for Nginx to be ready..."
+            sleep 5
+            sudo certbot --nginx -d ${{ env.BACKEND_DOMAIN }} --non-interactive --agree-tos -m ${{ secrets.CERTBOT_EMAIL }} --keep-until-expiring || echo "⚠️  SSL 인증서 설치 실패 - 나중에 수동으로 처리하세요"
             
             # 오래된 이미지 정리
             docker system prune -f
