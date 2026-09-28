@@ -57,6 +57,7 @@ jobs:
           SECRET_KEY=${{ secrets.SECRET_KEY }}
           ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}
           ADMIN_PASSWORD_HASH=${{ secrets.ADMIN_PASSWORD_HASH }}
+          API_KEYS=${{ secrets.API_KEYS }}
           FRONTEND_ORIGIN=${{ env.FRONTEND_ORIGIN }}
           AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}

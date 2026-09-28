@@ -1,15 +1,13 @@
 # app/routers/auth.py
-import os
 from datetime import timedelta
+from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Request
-from passlib.context import CryptContext
+from app.security.security import api_key_header, is_admin, \
+    verify_admin_credentials
+from fastapi import APIRouter, HTTPException, Request, Security
 from pydantic import BaseModel
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
-pwd = CryptContext(schemes=["bcrypt"], deprecated="auto")
-ADMIN_USER = os.getenv("ADMIN_USERNAME", "admin")
-ADMIN_HASH = os.getenv("ADMIN_PASSWORD_HASH", "")
 
 
 class LoginReq(BaseModel):
@@ -19,7 +17,7 @@ class LoginReq(BaseModel):
 
 @router.post("/login")
 def login(data: LoginReq, request: Request):
-    if data.username != ADMIN_USER or not pwd.verify(data.password, ADMIN_HASH):
+    if not verify_admin_credentials(data.username, data.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     request.session["admin"] = True
     request.session["exp"] = (timedelta(hours=12)).total_seconds()
@@ -33,5 +31,5 @@ def logout(request: Request):
 
 
 @router.get("/me")
-def me(request: Request):
-    return {"admin": bool(request.session.get("admin", False))}
+def me(request: Request, api_key: Optional[str] = Security(api_key_header)):
+    return {"admin": is_admin(request, api_key)}

@@ -7,7 +7,7 @@ from app.database import create_db_and_tables, test_db_connection
 # 라우터 import
 from app.routers import publications, education, experience, awards, \
     conferences, media, representative_works, research_areas, cv_markdown, cv, \
-    cv_services, research_highlights, cover_arts, auth, sitemap, hero
+    cv_services, research_highlights, cover_arts, auth, sitemap, hero, docs
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -46,7 +46,11 @@ app = FastAPI(
     description="Portfolio API for JoohoonKim's academic website",
     version="1.0.0",
     lifespan=lifespan,
-    redirect_slashes=False
+    redirect_slashes=False,
+    # 기본 문서 경로는 끄고 app/routers/docs.py 에서 로그인 후 제공
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
 )
 
 # 쿠키 세션
@@ -84,6 +88,7 @@ app.include_router(cv_markdown.router)
 app.include_router(auth.router)
 app.include_router(sitemap.router)
 app.include_router(hero.router)
+app.include_router(docs.router)
 
 # 정적 파일 서빙
 app.mount("/static", StaticFiles(directory="static"), name="static")

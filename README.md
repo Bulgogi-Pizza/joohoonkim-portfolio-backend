@@ -103,7 +103,7 @@ docker-compose down
 
 - `GET /` - API 상태 확인
 - `GET /health` - 헬스 체크
-- `GET /docs` - Swagger API 문서
+- `GET /docs` - Swagger API 문서 (관리자 로그인 필요, `/docs/login`)
 - `GET /api/publications` - 논문 목록
 - `GET /api/education` - 학력 정보
 - `POST /api/auth/login` - 관리자 로그인
@@ -125,6 +125,16 @@ alembic downgrade -1
 ## 환경 변수
 
 주요 환경 변수는 `.env.example` 파일을 참고하세요.
+
+## 인증
+
+- 관리자 API(POST/PUT/DELETE 등)는 **세션 쿠키** 또는 **`X-API-Key` 헤더**로 호출할 수 있습니다.
+- API 키는 `API_KEYS` 환경 변수에 쉼표로 구분해 등록합니다. 배포 시 GitHub Secret `API_KEYS`에 넣으세요.
+- `/docs`, `/redoc`, `/openapi.json`은 관리자 로그인 후에만 볼 수 있습니다. Swagger의 Authorize 버튼으로 API 키를 넣어 테스트할 수도 있습니다.
+
+```bash
+curl -H "X-API-Key: $API_KEY" https://api.joohoonkim.site/api/hero/all
+```
 
 ## 라이선스
 

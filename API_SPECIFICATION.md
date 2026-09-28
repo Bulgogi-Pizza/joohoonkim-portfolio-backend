@@ -5,13 +5,30 @@
 - Development: `http://localhost:8000`
 
 ## Authentication
-All admin endpoints require authentication using HTTP-only cookies.
+Admin endpoints accept either of the following. Public (GET) endpoints need no authentication.
 
 ### Session Cookie
-- Name: `session` or custom
+- Name: `admin_sess`
 - HttpOnly: `true`
-- Secure: `true` (production only)
-- SameSite: `Lax` or `Strict`
+- Secure: `true`
+- SameSite: `Lax`
+- Issued by `POST /api/auth/login` or the `/docs/login` page
+
+### API Key
+For scripts and server-to-server calls. Keys are configured via the `API_KEYS` environment variable (comma-separated).
+
+```http
+X-API-Key: <your-api-key>
+```
+
+Example:
+```bash
+curl -X POST https://api.joohoonkim.site/api/publications   -H "X-API-Key: $API_KEY" -H "Content-Type: application/json"   -d '{"title": "...", "authors": "...", "year": "2026"}'
+```
+
+### API Docs
+`/docs`, `/redoc`, `/openapi.json` require admin login. Visiting `/docs` redirects to `/docs/login`;
+`/docs/logout` ends the session. `/openapi.json` also accepts the `X-API-Key` header.
 
 ---
 
