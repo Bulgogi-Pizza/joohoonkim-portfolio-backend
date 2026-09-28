@@ -11,7 +11,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # 도메인 설정
-DOMAIN="api.joohoonkim.site"
+DOMAIN="api.photonicsskku.com"
 EMAIL="quitendexit@gmail.com"
 
 echo "📋 체크리스트를 확인합니다..."

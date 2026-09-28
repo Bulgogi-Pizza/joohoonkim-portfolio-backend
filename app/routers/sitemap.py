@@ -1,3 +1,5 @@
+import os
+
 from app.database import get_db
 from app.models import ResearchArea
 from fastapi import APIRouter, Depends
@@ -11,7 +13,7 @@ router = APIRouter(
 
 @router.get("/sitemap.xml")
 def sitemap(db: Session = Depends(get_db)):
-    base = "https://joohoonkim.site"
+    base = os.getenv("SITE_URL", "https://www.photonicsskku.com")
     areas = db.query(ResearchArea).filter(ResearchArea.is_active == True).all()
     urls = [
         f"{base}/",
