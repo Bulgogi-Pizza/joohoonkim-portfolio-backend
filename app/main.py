@@ -7,7 +7,8 @@ from app.database import create_db_and_tables, test_db_connection
 # 라우터 import
 from app.routers import publications, education, experience, awards, \
     conferences, media, representative_works, research_areas, cv_markdown, cv, \
-    cv_services, research_highlights, cover_arts, auth, sitemap, hero, docs
+    cv_services, research_highlights, cover_arts, auth, sitemap, hero, docs, \
+    members, opening
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -89,6 +90,8 @@ app.include_router(auth.router)
 app.include_router(sitemap.router)
 app.include_router(hero.router)
 app.include_router(docs.router)
+app.include_router(members.router)
+app.include_router(opening.router)
 
 # 정적 파일 서빙
 app.mount("/static", StaticFiles(directory="static"), name="static")

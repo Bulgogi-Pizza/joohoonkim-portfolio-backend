@@ -849,7 +849,11 @@ Authorization: Required (Session Cookie)
 ### 9.1 List Awards
 ```http
 GET /api/awards
+GET /api/awards?category=pi
 ```
+
+**Query Parameters:**
+- `category` (optional): `pi` | `student`. 생략 시 전체. `show_in_cv`와 함께 쓸 수 있다.
 
 **Response (200 OK):** `order_index` 내림차순 정렬 (NULLS LAST). 단 `?show_in_cv=` 지정 시 `cv_order` 오름차순.
 ```json
@@ -860,6 +864,7 @@ GET /api/awards
     "organization": "Government of Korea",
     "details": "Ph.D.",
     "year": "2024",
+    "category": "pi",
     "order_index": 1,
     "created_at": "2024-01-15T10:30:00Z",
     "updated_at": "2024-01-15T10:30:00Z"
@@ -876,13 +881,14 @@ Content-Type: application/json
 Authorization: Required (Session Cookie)
 ```
 
-**Request Body:** `order_index` 생략 시 생성된 행의 `id` 값으로 자동 설정 (항상 기존 최대값보다 크므로 맨 위에 추가됨)
+**Request Body:** `order_index` 생략 시 생성된 행의 `id` 값으로 자동 설정 (항상 기존 최대값보다 크므로 맨 위에 추가됨). `category`는 `pi` | `student`이며 생략 시 `pi`, 그 외 값은 422.
 ```json
 {
   "title": "Award Title",
   "organization": "Organization Name",
   "details": "Details",
   "year": "2024",
+  "category": "pi",
   "order_index": 1
 }
 ```
@@ -936,7 +942,7 @@ GET /api/hero
   "cta_primary_text": "Explore Research",
   "cta_primary_link": "/research",
   "cta_secondary_text": "View CV",
-  "cta_secondary_link": "/cv",
+  "cta_secondary_link": "/members/pi",
   "created_at": "2024-01-15T10:30:00Z",
   "updated_at": "2024-01-15T10:30:00Z"
 }
@@ -960,7 +966,7 @@ Authorization: Required (Session Cookie)
   "cta_primary_text": "Explore Research",
   "cta_primary_link": "/research",
   "cta_secondary_text": "View CV",
-  "cta_secondary_link": "/cv"
+  "cta_secondary_link": "/members/pi"
 }
 ```
 
@@ -1122,6 +1128,150 @@ Authorization: Required (Session Cookie)
 
 ---
 
+## 13. Members APIs
+
+### 13.1 List Members
+```http
+GET /api/members
+GET /api/members?category=researcher
+```
+
+**Query Parameters:**
+- `category` (optional): `pi` | `researcher` | `alumni`. 생략 시 전체.
+
+**Response (200 OK):** `order_index` 내림차순 정렬 (NULLS LAST).
+```json
+[
+  {
+    "id": 1,
+    "category": "researcher",
+    "name": "김주훈 (Joohoon Kim)",
+    "email": "kimjuhoon@postech.ac.kr",
+    "position": "Ph.D. student in Mechanical Engineering",
+    "research_interest": "Metasurfaces",
+    "education": ["B.S. in Mechanical Engineering, POSTECH"],
+    "image_path": "https://s3.amazonaws.com/joohoon-portfolio/members/a1b2c3d4.jpg",
+    "order_index": 1,
+    "created_at": "2026-10-11T10:30:00Z",
+    "updated_at": "2026-10-11T10:30:00Z"
+  }
+]
+```
+
+- `position`: 줄바꿈을 포함할 수 있으며 화면에 그대로 표시된다. alumni는 현재 소속(근무처)을 넣는다.
+- `education`: 학력 목록(문자열 배열, 표시 순서대로).
+
+---
+
+### 13.2 Create Member (Admin)
+```http
+POST /api/members
+Content-Type: application/json
+Authorization: Required (Session Cookie)
+```
+
+**Request Body:** `category`, `name` 필수. `category`가 허용 값이 아니면 422. `order_index` 생략 시 생성된 행의 `id` 값으로 자동 설정 (맨 위에 추가됨)
+```json
+{
+  "category": "researcher",
+  "name": "김주훈 (Joohoon Kim)",
+  "email": "kimjuhoon@postech.ac.kr",
+  "position": "Ph.D. student in Mechanical Engineering",
+  "research_interest": "Metasurfaces",
+  "education": ["B.S. in Mechanical Engineering, POSTECH"],
+  "image_path": null,
+  "order_index": null
+}
+```
+
+**Response (200 OK):** Created object
+
+---
+
+### 13.3 Update Member (Admin)
+```http
+PUT /api/members/{id}
+Content-Type: application/json
+Authorization: Required (Session Cookie)
+```
+
+**Request Body:** Same as Create (`category` 필수)
+
+**Response (200 OK):** Updated object
+
+---
+
+### 13.4 Delete Member (Admin)
+```http
+DELETE /api/members/{id}
+Authorization: Required (Session Cookie)
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Member deleted successfully"
+}
+```
+
+---
+
+### 13.5 Upload Member Image (Admin)
+```http
+POST /api/members/upload-image
+Content-Type: multipart/form-data
+Authorization: Required (Session Cookie)
+```
+
+**Request Body:** `file` (image)
+
+**Response (200 OK):**
+```json
+{
+  "image_path": "https://s3.amazonaws.com/joohoon-portfolio/members/a1b2c3d4.jpg"
+}
+```
+
+---
+
+## 14. Opening API
+
+Opening(모집 공고) 페이지의 마크다운 문서 한 건을 다룬다. 문서는 마이그레이션에서 빈 내용으로 미리 생성된다.
+
+### 14.1 Get Opening
+```http
+GET /api/opening
+```
+
+**Response (200 OK):** 문서가 없으면 404.
+```json
+{
+  "id": 1,
+  "content": "## Open Positions\n\nWe are looking for ...",
+  "updated_at": "2026-10-11T10:30:00Z"
+}
+```
+
+---
+
+### 14.2 Update Opening (Admin)
+```http
+PUT /api/opening
+Content-Type: application/json
+Authorization: Required (Session Cookie)
+```
+
+**Request Body:**
+```json
+{
+  "content": "## Open Positions\n\nWe are looking for ..."
+}
+```
+
+**Response (200 OK):** Updated object
+
+---
+
 ## Image Upload Requirements
 
 ### S3 Upload Configuration
@@ -1145,6 +1295,7 @@ bucket-name/
 ├── covers/
 ├── icons/
 ├── media/
+├── members/
 └── research-areas/
 ```
 
