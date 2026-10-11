@@ -1,8 +1,11 @@
 from datetime import datetime
-from typing import Optional
+from typing import List, Literal, Optional
 
 from pydantic import ConfigDict
-from sqlmodel import SQLModel, Field
+from sqlmodel import JSON, AutoString, Column, Field, SQLModel
+
+AwardCategory = Literal["pi", "student"]
+MemberCategory = Literal["pi", "researcher", "alumni"]
 
 
 class Education(SQLModel, table=True):
@@ -47,6 +50,7 @@ class Award(SQLModel, table=True):
     year: str
     rank: Optional[str] = None
     description: Optional[str] = None
+    category: AwardCategory = Field(default="pi", sa_type=AutoString)
     show_in_cv: bool = Field(default=False)
     cv_order: Optional[int] = Field(default=None)
     order_index: Optional[int] = Field(default=None)  # 공개 페이지 수동 정렬 (내림차순, 생성 시 id로 초기화 = 항상 맨 위)
@@ -266,7 +270,31 @@ class HeroContent(SQLModel, table=True):
     cta_primary_text: str = Field(default="Explore Research")
     cta_primary_link: str = Field(default="/research")
     cta_secondary_text: str = Field(default="View CV")
-    cta_secondary_link: str = Field(default="/cv")
+    cta_secondary_link: str = Field(default="/members/pi")
     is_active: bool = Field(default=True)
     created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class Member(SQLModel, table=True):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    category: MemberCategory = Field(sa_type=AutoString)
+    name: str
+    email: Optional[str] = None
+    position: Optional[str] = None
+    research_interest: Optional[str] = None
+    education: List[str] = Field(default_factory=list, sa_column=Column(JSON, nullable=False))
+    image_path: Optional[str] = None
+    order_index: Optional[int] = Field(default=None)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class Opening(SQLModel, table=True):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    content: str
     updated_at: datetime = Field(default_factory=datetime.utcnow)
