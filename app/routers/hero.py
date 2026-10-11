@@ -24,7 +24,7 @@ def get_active_hero(db: Session = Depends(get_db)):
             cta_primary_text="Explore Research",
             cta_primary_link="/research",
             cta_secondary_text="View CV",
-            cta_secondary_link="/cv",
+            cta_secondary_link="/members/pi",
             is_active=True
         )
     return hero
