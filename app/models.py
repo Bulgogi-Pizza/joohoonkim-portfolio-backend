@@ -5,7 +5,7 @@ from pydantic import ConfigDict
 from sqlmodel import JSON, AutoString, Column, Field, SQLModel
 
 AwardCategory = Literal["pi", "student"]
-MemberCategory = Literal["pi", "researcher", "alumni"]
+MemberCategory = Literal["pi", "researcher", "undergraduate", "alumni"]
 
 
 class Education(SQLModel, table=True):

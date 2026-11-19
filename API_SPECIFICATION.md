@@ -1137,7 +1137,7 @@ GET /api/members?category=researcher
 ```
 
 **Query Parameters:**
-- `category` (optional): `pi` | `researcher` | `alumni`. 생략 시 전체.
+- `category` (optional): `pi` | `researcher` | `undergraduate` | `alumni`. 생략 시 전체.
 
 **Response (200 OK):** `order_index` 내림차순 정렬 (NULLS LAST).
 ```json
